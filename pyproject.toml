@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "bayes-ball"
+version = "0.1.0"
+description = "A Bayesian approach to predicting football match outcomes. This repository combines predictive modelling and Bayesian inference to uncover probabilistic insights into the data-generating processes behind the beautiful game."
+authors = ["Ben Jones <benjones1479@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+ipykernel = "^6.29.5"
+pandas = "^2.2.3"
+scikit-learn = "^1.6.1"
+nbqa = "^1.9.1"
+black = "^24.10.0"
+flake8 = "^7.1.1"
+tensorflow = "^2.18.0"
+tensorflow-probability = {extras = ["tf"], version = "^0.25.0"}
+loguru = "^0.7.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 79
