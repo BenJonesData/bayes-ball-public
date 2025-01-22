@@ -5,7 +5,7 @@ A Bayesian approach to predicting football match outcomes. This repository combi
  - Match data is obtained from (football-data.co.uk)[https://www.football-data.co.uk]
 
 ## Collaborators
-* Ben Jones
+- Ben Jones
  - [Linkedin](https://www.linkedin.com/in/benjonesdata/)
  - [GitHub](https://github.com/BenJonesData)
  - Email: BenJones1479@gmail.com
