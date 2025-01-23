@@ -78,7 +78,7 @@ def enrich_data(data: pd.DataFrame) -> pd.DataFrame:
     return output_data
 
 
-def get_data(seasons: Iterable[int], leagues: List[str] | str = "all"):
+def get_data(seasons: Iterable[int], leagues: List[str] | str = "all") -> None:
     f"""
     Downloads, cleans, enriches, and saves game data.
 
@@ -122,7 +122,8 @@ def get_data(seasons: Iterable[int], leagues: List[str] | str = "all"):
                 continue
 
     data_full = pd.concat(data_list)
-    data_full.to_csv("data/raw_games.csv")
+    data_full.to_csv("data/raw_games.csv", index=False)
+    logger.info("All available data loaded and saved to data/raw_games.csv")
 
 
 if __name__ == "__main__":

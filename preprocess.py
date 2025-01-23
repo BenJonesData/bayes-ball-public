@@ -7,9 +7,10 @@ create such a dataset with the two covid seasons removed.
 
 import pandas as pd
 from typing import List
+from loguru import logger
 
 
-def create_dataset(data: pd.DataFrame, exclude_seasons: List[str] = None):
+def create_dataset(data: pd.DataFrame, exclude_seasons: List[str] = None) -> None:
     """
     Creates and saves a dataset of games from the second half of seasons with
     aggregated stats from the first half of the season.
@@ -19,9 +20,11 @@ def create_dataset(data: pd.DataFrame, exclude_seasons: List[str] = None):
         exclude_seasons (List[str]): a list of seasons to remove.
     """
     data = data.copy()
+    logger.info("Starting dataset creation")
 
     if exclude_seasons is not None:
         data = data[~data["season"].isin(exclude_seasons)]
+        logger.info(f"Sucessfully removed seasons: {exclude_seasons}")
 
     home_h1_data = data.loc[
         data["season_half_h"] == 1,
@@ -119,6 +122,7 @@ def create_dataset(data: pd.DataFrame, exclude_seasons: List[str] = None):
         },
         inplace=True,
     )
+    logger.info("Home and away dataframes created succesfully")
 
     # create a column for proportion of matches played at home
     home_h1_data["prop_h"] = 1
@@ -128,6 +132,7 @@ def create_dataset(data: pd.DataFrame, exclude_seasons: List[str] = None):
     stats_h1 = (
         all_h1_data.groupby(["season", "div", "team"]).mean().reset_index()
     )
+    logger.info("Home and away dataframes succesfully combined and grouped")
 
     results_h2 = data.loc[
         (data["season_half_h"] == 2) & (data["season_half_a"] == 2),
@@ -149,19 +154,23 @@ def create_dataset(data: pd.DataFrame, exclude_seasons: List[str] = None):
         right_on=["a_season", "a_div", "a_team"],
         how="inner",
     )
+    logger.info("Team stats succesfully merged onto game data")
 
     # clean up duplicate columns
     results_h2.drop(
         columns=["h_season", "h_div", "a_season", "a_div"], inplace=True
     )
+    logger.info("Duplicate columns successfully dropped")
 
     # one hot encode
     results_h2["ftr_h"] = (results_h2["ftr"] == "H").astype(int)
     results_h2["ftr_d"] = (results_h2["ftr"] == "D").astype(int)
     results_h2["ftr_a"] = (results_h2["ftr"] == "A").astype(int)
+    logger.info("Full-time results sucessfully encoded")
 
-    results_h2.to_csv("data/processed_data.csv")
-
+    results_h2.to_csv("data/processed_data.csv", index=False)
+    logger.info("Dataset created and saved to data/processed_data.csv")
+  
 
 if __name__ == "__main__":
     data = pd.read_csv("data/raw_games.csv")
