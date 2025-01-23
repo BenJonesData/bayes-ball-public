@@ -78,7 +78,7 @@ def enrich_data(data: pd.DataFrame) -> pd.DataFrame:
     return output_data
 
 
-def get_data(seasons: Iterable[int], leagues: List[str] | str = "all"):
+def get_data(seasons: Iterable[int], leagues: List[str] | str = "all") -> None:
     f"""
     Downloads, cleans, enriches, and saves game data.
 

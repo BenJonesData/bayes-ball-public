@@ -9,7 +9,7 @@ import pandas as pd
 from typing import List
 
 
-def create_dataset(data: pd.DataFrame, exclude_seasons: List[str] = None):
+def create_dataset(data: pd.DataFrame, exclude_seasons: List[str] = None) -> None:
     """
     Creates and saves a dataset of games from the second half of seasons with
     aggregated stats from the first half of the season.
@@ -162,6 +162,9 @@ def create_dataset(data: pd.DataFrame, exclude_seasons: List[str] = None):
 
     results_h2.to_csv("data/processed_data.csv")
 
+def spit_dataset(data: pd.DataFrame) -> None:
+    """
+    """
 
 if __name__ == "__main__":
     data = pd.read_csv("data/raw_games.csv")
