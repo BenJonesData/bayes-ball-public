@@ -162,12 +162,6 @@ def create_dataset(data: pd.DataFrame, exclude_seasons: List[str] = None) -> Non
     )
     logger.info("Duplicate columns successfully dropped")
 
-    # one hot encode
-    results_h2["ftr_h"] = (results_h2["ftr"] == "H").astype(int)
-    results_h2["ftr_d"] = (results_h2["ftr"] == "D").astype(int)
-    results_h2["ftr_a"] = (results_h2["ftr"] == "A").astype(int)
-    logger.info("Full-time results sucessfully encoded")
-
     results_h2.to_csv("data/processed_data.csv", index=False)
     logger.info("Dataset created and saved to data/processed_data.csv")
   
