@@ -1,9 +1,3 @@
-"""
-Script containing functions to download and data from football-data.co.uk.
-Running this script will download gamecdata for all leagues between the start
-of the 2010 season and present.
-"""
-
 import pandas as pd
 from typing import Iterable, List
 from loguru import logger
@@ -15,6 +9,9 @@ DESIRED_COLS = [
     "Date",
     "HomeTeam",
     "AwayTeam",
+    "B365H",
+    "B365D",
+    "B365A",
     "FTHG",
     "FTAG",
     "FTR",
@@ -34,26 +31,33 @@ DESIRED_COLS = [
     "HR",
     "AR",
 ]
-LEAGUES = ["E0", "E1", "E2", "E3", "EC"]
+LEAGUES = [
+    "E0",
+    "E1",
+    "E2",
+    "E3",
+    "EC",
+    "SC0",
+    "SC1",
+    "SC2",
+    "SC3",
+    "D1",
+    "D2",
+    "I1",
+    "I2",
+    "SP1",
+    "SP2",
+    "F1",
+    "F2",
+]
 
 
 def enrich_data(data: pd.DataFrame) -> pd.DataFrame:
-    """
-    Adds game number and season half columns to the game data.
-
-    Args:
-        data (pd.DataFrame): The game data.
-
-    Returns:
-        pd.DataFrame: The enriched game data.
-    """
     output_data = data.copy()
-    # TODO: order by date but some dates are in different formats
 
     teams = list(output_data["hometeam"].drop_duplicates())
     half_way_point = len(teams) - 1
 
-    # create a column for game number for both the home and away teams
     team_counter = Counter()
     game_num_h = []
     game_num_a = []
@@ -65,7 +69,6 @@ def enrich_data(data: pd.DataFrame) -> pd.DataFrame:
     output_data["game_num_h"] = game_num_h
     output_data["game_num_a"] = game_num_a
 
-    # determine if each team is in the first or second half of their season
     output_data["season_half_h"] = 1
     output_data["season_half_a"] = 1
     output_data.loc[
@@ -79,14 +82,6 @@ def enrich_data(data: pd.DataFrame) -> pd.DataFrame:
 
 
 def get_data(seasons: Iterable[int], leagues: List[str] | str = "all") -> None:
-    f"""
-    Downloads, cleans, enriches, and saves game data.
-
-    Args:
-        seasons (Iterable[int]): The start year of each season desired.
-        leagues (List[str] or str): The leagues desired. Options are
-            {LEAGUES}. Defaults to all.
-    """
     if leagues == "all":
         leagues = LEAGUES
     elif not set(leagues).issubset(set(LEAGUES)):

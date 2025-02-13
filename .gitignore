@@ -1,1 +1,4 @@
 data/*.csv
+mlflow
+
+__pycache__
