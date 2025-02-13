@@ -1,2 +1,3 @@
 data/*.csv
 mlflow
+src/__pycache__
