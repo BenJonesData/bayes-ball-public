@@ -16,6 +16,7 @@ from bayesian_nn import (
 )
 from priors_posteriors import std_normal_prior, std_normal_posterior
 
+mlflow.start_run()
 
 parser = argparse.ArgumentParser()
 
@@ -111,28 +112,27 @@ pairwise_differences = bookies_squared_errors - val_squared_errors
 
 _, p_val_two_tailed = ttest_1samp(pairwise_differences, 0, alternative="greater")
 
-with mlflow.start_run():
-    mlflow.log_params(
-        {
-            "model_type": "bayesian_nn",
-            "prior": std_normal_prior.__name__,
-            "posterior": std_normal_posterior.__name__,
-            "feature_names": feature_names,
-            "n_train": n_train,
-            "num_batches": args.num_batches,
-            "hidden_units": args.hidden_units,
-            "num_epochs": args.num_epochs,
-            "learning_rate": args.learning_rate,
-            "num_samples": args.num_samples,
-        }
-    )
+mlflow.log_params(
+    {
+        "model_type": "bayesian_nn",
+        "prior": std_normal_prior.__name__,
+        "posterior": std_normal_posterior.__name__,
+        "feature_names": feature_names,
+        "n_train": n_train,
+        "num_batches": args.num_batches,
+        "hidden_units": args.hidden_units,
+        "num_epochs": args.num_epochs,
+        "learning_rate": args.learning_rate,
+        "num_samples": args.num_samples,
+    }
+)
 
-    mlflow.log_metrics(
-        {
-            "train_mse": train_mse,
-            "train_auc": train_auc,
-            "val_mse": val_mse,
-            "val_auc": val_auc,
-            "beat_bookies_pvalue": p_val_two_tailed
-        }
-    )
+mlflow.log_metrics(
+    {
+        "train_mse": train_mse,
+        "train_auc": train_auc,
+        "val_mse": val_mse,
+        "val_auc": val_auc,
+        "beat_bookies_pvalue": p_val_two_tailed
+    }
+)
