@@ -1,24 +1,29 @@
-"""
-Script containing functions to take in game data downloaded in ingestion.py
-and transform into a dataset containing games from the second half of seasons
-with features derived from the first half of seasons. Running this script will
-create such a dataset with the two covid seasons removed.
-"""
-
 import pandas as pd
-from typing import List
+from typing import List, Tuple
 from loguru import logger
+from sklearn.model_selection import train_test_split
+import os
 
 
-def create_dataset(data: pd.DataFrame, exclude_seasons: List[str] = None) -> None:
-    """
-    Creates and saves a dataset of games from the second half of seasons with
-    aggregated stats from the first half of the season.
+def get_train_test(
+    data: pd.DataFrame, test_size: int = 2, random_state: int = None
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    unique_groups = data.loc[:, "season"].unique()
 
-    Args:
-        data (pd.DataFrame): The game data with a season half column.
-        exclude_seasons (List[str]): a list of seasons to remove.
-    """
+    train_groups, test_groups = train_test_split(
+        unique_groups, test_size=test_size, random_state=random_state
+    )
+
+    train_data = data.loc[data["season"].isin(train_groups)]
+    test_data = data.loc[data["season"].isin(test_groups)]
+
+    return train_data, test_data
+
+
+def create_dataframe(
+    data: pd.DataFrame, exclude_seasons: List[str] = None
+) -> pd.DataFrame:
+
     data = data.copy()
     logger.info("Starting dataset creation")
 
@@ -75,7 +80,6 @@ def create_dataset(data: pd.DataFrame, exclude_seasons: List[str] = None) -> Non
         ],
     ]
 
-    # for home teams, home stats are for and away stats are against
     home_h1_data.rename(
         columns={
             "hometeam": "team",
@@ -99,7 +103,6 @@ def create_dataset(data: pd.DataFrame, exclude_seasons: List[str] = None) -> Non
         inplace=True,
     )
 
-    # for away teams, home stats are against and away stats are for
     away_h1_data.rename(
         columns={
             "awayteam": "team",
@@ -124,10 +127,6 @@ def create_dataset(data: pd.DataFrame, exclude_seasons: List[str] = None) -> Non
     )
     logger.info("Home and away dataframes created succesfully")
 
-    # create a column for proportion of matches played at home
-    home_h1_data["prop_h"] = 1
-    away_h1_data["prop_h"] = 0
-
     all_h1_data = pd.concat([home_h1_data, away_h1_data])
     stats_h1 = (
         all_h1_data.groupby(["season", "div", "team"]).mean().reset_index()
@@ -136,7 +135,17 @@ def create_dataset(data: pd.DataFrame, exclude_seasons: List[str] = None) -> Non
 
     results_h2 = data.loc[
         (data["season_half_h"] == 2) & (data["season_half_a"] == 2),
-        ["season", "div", "date", "hometeam", "awayteam", "ftr"],
+        [
+            "season",
+            "div",
+            "date",
+            "hometeam",
+            "awayteam",
+            "ftr",
+            "b365h",
+            "b365d",
+            "b365a",
+        ],
     ]
     results_h2.rename(
         columns={"hometeam": "h_team", "awayteam": "a_team"}, inplace=True
@@ -156,17 +165,47 @@ def create_dataset(data: pd.DataFrame, exclude_seasons: List[str] = None) -> Non
     )
     logger.info("Team stats succesfully merged onto game data")
 
-    # clean up duplicate columns
     results_h2.drop(
         columns=["h_season", "h_div", "a_season", "a_div"], inplace=True
     )
     logger.info("Duplicate columns successfully dropped")
 
-    results_h2.to_csv("data/processed_data.csv", index=False)
-    logger.info("Dataset created and saved to data/processed_data.csv")
-  
+    results_h2["h_win"] = (results_h2["ftr"] == "H").astype(int)
+
+    results_h2.dropna(subset="b365h", inplace=True)
+    results_h2 = results_h2[results_h2["b365h"] != 0]
+
+    bookies_margin = (1 / results_h2["b365h"]) + (1 / results_h2["b365d"]) + (1 / results_h2["b365a"])
+    results_h2["bookies_prob"] = bookies_margin / results_h2["b365h"]
+
+    logger.info("Dataset creation complete")
+    logger.info(f"Dataset length: {len(results_h2)}")
+
+    return results_h2
+
 
 if __name__ == "__main__":
-    data = pd.read_csv("data/raw_games.csv")
-    # remove covid seasons
-    create_dataset(data, exclude_seasons=["19_20", "20_21"])
+    raw_games = pd.read_csv("data/raw_games.csv")
+    df = create_dataframe(
+        raw_games, exclude_seasons=["19_20", "20_21", "24_25"]
+    )
+
+    train_val, test = get_train_test(df, test_size=3, random_state=147)
+
+    train_val = train_val.drop(
+        columns=[
+            "div",
+            "date",
+            "h_team",
+            "a_team",
+            "ftr",
+            "b365h",
+            "b365d",
+            "b365a",
+        ]
+    )
+
+    train_val.to_csv("data/train_val_data.csv", index=False)
+    test.to_csv("data/test_data.csv", index=False)
+
+    os.remove("data/raw_games.csv")
