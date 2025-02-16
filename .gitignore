@@ -1,3 +1,5 @@
 data/*.csv
 mlflow
 __pycache__
+credentials.py
+.venv
