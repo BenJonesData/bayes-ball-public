@@ -160,7 +160,11 @@ def create_dataframe(
     results_h2.dropna(subset="b365h", inplace=True)
     results_h2 = results_h2[results_h2["b365h"] != 0]
 
-    bookies_margin = (1 / results_h2["b365h"]) + (1 / results_h2["b365d"]) + (1 / results_h2["b365a"])
+    bookies_margin = (
+        (1 / results_h2["b365h"])
+        + (1 / results_h2["b365d"])
+        + (1 / results_h2["b365a"])
+    )
     results_h2["bookies_prob"] = bookies_margin / results_h2["b365h"]
 
     logger.info("Dataset creation complete")

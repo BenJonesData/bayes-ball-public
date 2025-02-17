@@ -31,25 +31,7 @@ DESIRED_COLS = [
     "HR",
     "AR",
 ]
-LEAGUES = [
-    "E0",
-    # "E1",
-    # "E2",
-    # "E3",
-    # "EC",
-    # "SC0",
-    # "SC1",
-    # "SC2",
-    # "SC3",
-    # "D1",
-    # "D2",
-    # "I1",
-    # "I2",
-    # "SP1",
-    # "SP2",
-    # "F1",
-    # "F2",
-]
+LEAGUES = ["E0"]
 
 
 def enrich_data(data: pd.DataFrame) -> pd.DataFrame:
