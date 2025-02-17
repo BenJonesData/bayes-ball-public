@@ -9,3 +9,4 @@ A Bayesian approach to predicting football match outcomes. This repository combi
   - [LinkedIn](https://www.linkedin.com/in/benjonesdata/)
   - [GitHub](https://github.com/BenJonesData)
   - Email: BenJones1479@gmail.com
+- Charlie Young
