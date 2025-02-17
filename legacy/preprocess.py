@@ -1,23 +1,8 @@
 import pandas as pd
-from typing import List, Tuple
+from typing import List
 from loguru import logger
-from sklearn.model_selection import train_test_split
 import os
-
-
-def get_train_test(
-    data: pd.DataFrame, test_size: int = 2, random_state: int = None
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    unique_groups = data.loc[:, "season"].unique()
-
-    train_groups, test_groups = train_test_split(
-        unique_groups, test_size=test_size, random_state=random_state
-    )
-
-    train_data = data.loc[data["season"].isin(train_groups)]
-    test_data = data.loc[data["season"].isin(test_groups)]
-
-    return train_data, test_data
+from src.helper_functions import get_train_test
 
 
 def create_dataframe(

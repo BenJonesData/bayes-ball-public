@@ -4,7 +4,7 @@ import pandas as pd
 from sklearn.metrics import roc_auc_score, brier_score_loss
 import mlflow
 import argparse
-from preprocess import get_train_test
+from helper_functions import get_train_test
 from scipy.stats import ttest_1samp
 
 from bayesian_nn import (
@@ -16,7 +16,6 @@ from bayesian_nn import (
 )
 from priors_posteriors import std_normal_prior, std_normal_posterior
 
-mlflow.start_run()
 
 parser = argparse.ArgumentParser()
 
@@ -51,11 +50,18 @@ parser.add_argument(
     default=1,
     help="Number of batches for training",
 )
+parser.add_argument(
+    "--league_tag",
+    type=str,
+    default=None,
+    help="The league intended for the model",
+)
 
 args = parser.parse_args()
 
 mlflow.set_tracking_uri("http://localhost:5001")
 mlflow.set_experiment("bayesball-h2-home-win-predictor")
+mlflow.start_run()
 
 train_val = pd.read_csv(args.training_data_path)
 
@@ -106,11 +112,18 @@ mean_val_probs = np.mean(sampled_val_probs, axis=0)
 val_mse = brier_score_loss(val_data["h_win"], mean_val_probs)
 val_auc = roc_auc_score(val_data["h_win"], mean_val_probs)
 
+bookies_val_mse = brier_score_loss(val_data["h_win"], val_data["bookies_prob"])
+bookies_val_auc = roc_auc_score(val_data["h_win"], val_data["bookies_prob"])
+val_mse_diff = val_mse - bookies_val_mse
+val_auc_diff = val_auc - bookies_val_auc
+
 val_squared_errors = (mean_val_probs - val_data["h_win"]) ** 2
 bookies_squared_errors = (val_data["bookies_prob"] - val_data["h_win"]) ** 2
 pairwise_differences = bookies_squared_errors - val_squared_errors
 
 _, p_val_two_tailed = ttest_1samp(pairwise_differences, 0, alternative="greater")
+
+mlflow.set_tag("league", args.league_tag)
 
 mlflow.log_params(
     {
@@ -133,6 +146,10 @@ mlflow.log_metrics(
         "train_auc": train_auc,
         "val_mse": val_mse,
         "val_auc": val_auc,
+        "bookies_val_mse": bookies_val_mse,        
+        "bookies_val_auc": bookies_val_auc,
+        "val_mse_diff": val_mse_diff,      
+        "val_auc_diff": val_auc_diff,  
         "beat_bookies_pvalue": p_val_two_tailed
     }
 )
