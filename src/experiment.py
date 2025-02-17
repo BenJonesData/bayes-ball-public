@@ -4,7 +4,7 @@ import pandas as pd
 from sklearn.metrics import roc_auc_score, brier_score_loss
 import mlflow
 import argparse
-from preprocess import get_train_test
+from helper_functions import get_train_test
 from scipy.stats import ttest_1samp
 
 from bayesian_nn import (
