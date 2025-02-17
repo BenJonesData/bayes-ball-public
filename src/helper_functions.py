@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from typing import Tuple
 import tf_keras as tfk
-import tqdm
+from tqdm import tqdm
 
 
 class EpochProgressBar(tfk.callbacks.Callback):
