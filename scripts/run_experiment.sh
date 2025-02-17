@@ -6,4 +6,5 @@ poetry run python src/experiment.py \
     --num_epochs 10000 \
     --num_samples 1000 \
     --num_batches 1 \
+    --league_tag 'epl'
     # --hidden_units  
