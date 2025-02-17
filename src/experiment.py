@@ -16,7 +16,6 @@ from bayesian_nn import (
 )
 from priors_posteriors import std_normal_prior, std_normal_posterior
 
-mlflow.start_run()
 
 parser = argparse.ArgumentParser()
 
@@ -56,6 +55,7 @@ args = parser.parse_args()
 
 mlflow.set_tracking_uri("http://localhost:5001")
 mlflow.set_experiment("bayesball-h2-home-win-predictor")
+mlflow.start_run()
 
 train_val = pd.read_csv(args.training_data_path)
 
