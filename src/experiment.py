@@ -4,7 +4,7 @@ import pandas as pd
 from sklearn.metrics import roc_auc_score, brier_score_loss
 import mlflow
 import argparse
-from helper_functions import get_train_test
+from helper_functions import get_train_test, EpochProgressBar
 from scipy.stats import ttest_1samp
 
 from bayesian_nn import (
@@ -12,7 +12,6 @@ from bayesian_nn import (
     make_dataset,
     create_bnn_model,
     model_inference,
-    EpochProgressBar,
 )
 from priors_posteriors import std_normal_prior, std_normal_posterior
 
@@ -77,9 +76,7 @@ batch_size = int(len(train_data) / args.num_batches)
 X_train, y_train = extract_features_and_target(
     train_data, feature_names, "h_win"
 )
-X_val, y_val = extract_features_and_target(
-    val_data.drop(columns="bookies_prob"), feature_names, "h_win"
-)
+X_val, y_val = extract_features_and_target(val_data.drop(columns="bookies_prob"), feature_names, "h_win")
 
 train_dataset = make_dataset(X_train, y_train, n_train, batch_size)
 
@@ -104,16 +101,12 @@ model.fit(
     verbose=0,
 )
 
-sampled_train_probs = model_inference(
-    model, X_train, args.num_samples, tag="training"
-)
+sampled_train_probs = model_inference(model, X_train, args.num_samples, tag="training")
 mean_train_probs = np.mean(sampled_train_probs, axis=0)
 train_mse = brier_score_loss(y_train, mean_train_probs)
 train_auc = roc_auc_score(y_train, mean_train_probs)
 
-sampled_val_probs = model_inference(
-    model, X_val, args.num_samples, tag="validation"
-)
+sampled_val_probs = model_inference(model, X_val, args.num_samples, tag="validation")
 mean_val_probs = np.mean(sampled_val_probs, axis=0)
 val_mse = brier_score_loss(val_data["h_win"], mean_val_probs)
 val_auc = roc_auc_score(val_data["h_win"], mean_val_probs)
@@ -127,9 +120,7 @@ val_squared_errors = (mean_val_probs - val_data["h_win"]) ** 2
 bookies_squared_errors = (val_data["bookies_prob"] - val_data["h_win"]) ** 2
 pairwise_differences = bookies_squared_errors - val_squared_errors
 
-_, p_val_two_tailed = ttest_1samp(
-    pairwise_differences, 0, alternative="greater"
-)
+_, p_val_two_tailed = ttest_1samp(pairwise_differences, 0, alternative="greater")
 
 mlflow.set_tag("league", args.league_tag)
 
@@ -154,10 +145,10 @@ mlflow.log_metrics(
         "train_auc": train_auc,
         "val_mse": val_mse,
         "val_auc": val_auc,
-        "bookies_val_mse": bookies_val_mse,
+        "bookies_val_mse": bookies_val_mse,        
         "bookies_val_auc": bookies_val_auc,
-        "val_mse_diff": val_mse_diff,
-        "val_auc_diff": val_auc_diff,
-        "beat_bookies_pvalue": p_val_two_tailed,
+        "val_mse_diff": val_mse_diff,      
+        "val_auc_diff": val_auc_diff,  
+        "beat_bookies_pvalue": p_val_two_tailed
     }
 )
