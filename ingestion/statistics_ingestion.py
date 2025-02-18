@@ -10,7 +10,7 @@ def get_fixture_ids():
     ids = pd.read_csv("data/ids/fixture_ids.csv")
     return ids
 
-def get_fixture_statistics(fixture_id):
+def get_statistics(fixture_id):
     BASE_URL = "https://v3.football.api-sports.io"
 
     url = f"{BASE_URL}/fixtures/statistics?fixture={fixture_id}"
@@ -32,16 +32,16 @@ def get_fixture_statistics(fixture_id):
         df['fixture_id'] = fixture_id
     return df
 
-def get_all_fixture_statistics():
-    all_fixtures_statistcs = pd.DataFrame()
+def get_all_statistics():
+    all_statistcs = pd.DataFrame()
 
     fixture_ids = get_fixture_ids()
-    for fixture_id in tqdm(fixture_ids['fixture_ids'][0:1000]):
+    for fixture_id in tqdm(fixture_ids['fixture_ids']):
         df = get_fixture_statistics(fixture_id)
-        all_fixtures_statistcs = pd.concat([all_fixtures_statistcs, df], ignore_index=True)
+        all_statistcs = pd.concat([all_statistcs, df], ignore_index=True)
     
     os.makedirs("data/", exist_ok=True)
-    all_fixtures_statistcs.to_csv("data/fixtures_statistics.csv", index=False)
+    all_statistcs.to_csv("data/statistics.csv", index=False)
 
 if __name__=='__main__':
     get_all_fixture_statistics()
