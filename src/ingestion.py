@@ -3,38 +3,8 @@ from typing import Iterable, List
 from loguru import logger
 from collections import Counter
 
-DESIRED_COLS = [
-    "season",
-    "Div",
-    "Date",
-    "HomeTeam",
-    "AwayTeam",
-    "B365H",
-    "B365D",
-    "B365A",
-    "FTHG",
-    "FTAG",
-    "FTR",
-    "HTHG",
-    "HTAG",
-    "HTR",
-    "HS",
-    "AS",
-    "HST",
-    "AST",
-    "HC",
-    "AC",
-    "HF",
-    "AF",
-    "HY",
-    "AY",
-    "HR",
-    "AR",
-]
-LEAGUES = ["E0"]
 
-
-def enrich_data(data: pd.DataFrame) -> pd.DataFrame:
+def _enrich_data_fduk(data: pd.DataFrame) -> pd.DataFrame:
     output_data = data.copy()
 
     teams = list(output_data["hometeam"].drop_duplicates())
@@ -63,16 +33,12 @@ def enrich_data(data: pd.DataFrame) -> pd.DataFrame:
     return output_data
 
 
-def get_data(seasons: Iterable[int], leagues: List[str] | str = "all") -> None:
-    if leagues == "all":
-        leagues = LEAGUES
-    elif not set(leagues).issubset(set(LEAGUES)):
-        raise ValueError(
-            f"""
-            Invalid league provided. Please chose one or more from {LEAGUES}
-        """
-        )
-
+def get_data_fduk(
+    seasons: Iterable[int],
+    leagues: List[str],
+    columns: List[str],
+    enrich: bool,
+) -> None:
     data_list = []
     for start_y in seasons:
         season = str(start_y) + str(start_y + 1)
@@ -85,10 +51,11 @@ def get_data(seasons: Iterable[int], leagues: List[str] | str = "all") -> None:
             try:
                 data = pd.read_csv(url)
                 data["season"] = season_tag
-                data = data[DESIRED_COLS]
+                data = data[columns]
                 data.columns = [col.lower() for col in data.columns]
-                processed_data = enrich_data(data)
-                data_list.append(processed_data)
+                if enrich:
+                    data = _enrich_data_fduk(data)
+                data_list.append(data)
                 logger.info(
                     f"Sucessfully loaded data for {league} in {season_tag}"
                 )
@@ -99,9 +66,5 @@ def get_data(seasons: Iterable[int], leagues: List[str] | str = "all") -> None:
                 continue
 
     data_full = pd.concat(data_list)
-    data_full.to_csv("data/raw_games.csv", index=False)
-    logger.info("All available data loaded and saved to data/raw_games.csv")
 
-
-if __name__ == "__main__":
-    get_data(range(10, 25))
+    return data_full
