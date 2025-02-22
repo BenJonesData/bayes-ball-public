@@ -89,5 +89,5 @@ if __name__ == "__main__":
         args.league_tag,
         args.run_id,
         args.run_description,
-        return_model=False
+        return_model=False,
     )
