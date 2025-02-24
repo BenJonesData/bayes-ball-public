@@ -1,7 +1,6 @@
 import pandas as pd
 from typing import List
 from loguru import logger
-import os
 from src.helper_functions import get_train_test
 
 
@@ -171,30 +170,3 @@ def create_dataframe(
     logger.info(f"Dataset length: {len(results_h2)}")
 
     return results_h2
-
-
-if __name__ == "__main__":
-    raw_games = pd.read_csv("data/raw_games.csv")
-    df = create_dataframe(
-        raw_games, exclude_seasons=["19_20", "20_21", "24_25"]
-    )
-
-    train_val, test = get_train_test(df, test_size=3, random_state=147)
-
-    train_val = train_val.drop(
-        columns=[
-            "div",
-            "date",
-            "h_team",
-            "a_team",
-            "ftr",
-            "b365h",
-            "b365d",
-            "b365a",
-        ]
-    )
-
-    train_val.to_csv("data/train_val_data.csv", index=False)
-    test.to_csv("data/test_data.csv", index=False)
-
-    os.remove("data/raw_games.csv")
