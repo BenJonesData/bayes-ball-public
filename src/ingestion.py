@@ -43,6 +43,7 @@ def get_data_fduk(
     for start_y in seasons:
         season = str(start_y) + str(start_y + 1)
         season_tag = str(start_y) + "_" + str(start_y + 1)
+        
         for league in leagues:
             url = (
                 "https://www.football-data.co.uk/mmz4281/"
@@ -51,11 +52,17 @@ def get_data_fduk(
             try:
                 data = pd.read_csv(url)
                 data["season"] = season_tag
-                data = data[columns]
+
+                include_columns = [col for col in columns if col in data.columns]
+                data = data[include_columns]
+
                 data.columns = [col.lower() for col in data.columns]
+
                 if enrich:
                     data = _enrich_data_fduk(data)
+
                 data_list.append(data)
+
                 logger.info(
                     f"Sucessfully loaded data for {league} in {season_tag}"
                 )
