@@ -1,4 +1,3 @@
-import pandas as pd
 import argparse
 
 from src.ingestion import get_data_fduk
