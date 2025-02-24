@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # This file is intended as a quick means of running run_experiment.py
+# This file can be editted and ran using `bash scripts/experimentation/run_experiment.sh`
 # Please do not push any changes to this file 
 
 poetry run python scripts/experimentation/experiment.py \

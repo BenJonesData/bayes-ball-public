@@ -13,7 +13,7 @@ from src.bayesian_nn import (
     model_inference,
 )
 from src.priors_posteriors import std_normal_prior, std_normal_posterior
-from src.helper_functions import EpochProgressBar #, bootstrap_mse
+from src.helper_functions import EpochProgressBar  # , bootstrap_mse
 
 
 def run_experiment(

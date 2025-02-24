@@ -1,7 +1,6 @@
 import pandas as pd
 from typing import List
 from loguru import logger
-import os
 from src.helper_functions import get_train_test
 
 

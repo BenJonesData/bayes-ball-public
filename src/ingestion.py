@@ -40,7 +40,7 @@ def get_data_fduk(
     columns: List[str],
     enrich: bool,
 ) -> None:
-    
+
     with open("config/config.json", "r") as f:
         column_mapping = json.load(f)
 
@@ -49,8 +49,8 @@ def get_data_fduk(
         start_y_str = ("0" + str(start_y))[-2:]
         end_y_str = ("0" + str(start_y + 1))[-2:]
         season = start_y_str + end_y_str
-        season_tag = start_y_str + "_" + end_y_str 
-        
+        season_tag = start_y_str + "_" + end_y_str
+
         for league in leagues:
             url = (
                 "https://www.football-data.co.uk/mmz4281/"
@@ -60,7 +60,9 @@ def get_data_fduk(
                 data = pd.read_csv(url)
                 data["season"] = season_tag
 
-                include_columns = [col for col in columns if col in data.columns]
+                include_columns = [
+                    col for col in columns if col in data.columns
+                ]
                 data = data[include_columns]
 
                 data = data.rename(columns=column_mapping)
