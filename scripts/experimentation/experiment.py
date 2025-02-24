@@ -1,6 +1,6 @@
 import pandas as pd
 import argparse
-from src.experiment import run_experiment
+from src.experimentation import run_experiment
 
 if __name__ == "__main__":
 
