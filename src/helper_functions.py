@@ -3,7 +3,8 @@ from sklearn.model_selection import train_test_split
 from typing import Tuple
 import tf_keras as tfk
 from tqdm import tqdm
-
+import random
+import string
 
 class EpochProgressBar(tfk.callbacks.Callback):
     def on_train_begin(self, logs=None):
@@ -32,3 +33,8 @@ def get_train_test(
     test_data = data.loc[data["season"].isin(test_groups)]
 
     return train_data, test_data
+
+def generate_random_string(length=6):
+    characters = string.ascii_letters + string.digits
+    random_string = ''.join(random.choices(characters, k=length))
+    return random_string
