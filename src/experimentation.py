@@ -3,19 +3,17 @@ import tf_keras as tfk
 import pandas as pd
 from sklearn.metrics import roc_auc_score, brier_score_loss
 import mlflow
-import argparse
-from helper_functions import EpochProgressBar
 from scipy.stats import ttest_1samp
 from typing import List
 
-from bayesian_nn import (
+from src.bayesian_nn import (
     extract_features_and_target,
     make_dataset,
     create_bnn_model,
     model_inference,
 )
-from priors_posteriors import std_normal_prior, std_normal_posterior
-from helper_functions import bootstrap_mse
+from src.priors_posteriors import std_normal_prior, std_normal_posterior
+from src.helper_functions import EpochProgressBar #, bootstrap_mse
 
 
 def run_experiment(
@@ -89,7 +87,7 @@ def run_experiment(
     )
     mean_val_probs = np.mean(sampled_val_probs, axis=0)
     val_mse = brier_score_loss(val_data["h_win"], mean_val_probs)
-    val_mse_ci = bootstrap_mse(val_data["h_win"], mean_val_probs)
+    # val_mse_ci = bootstrap_mse(val_data["h_win"], mean_val_probs)
     val_auc = roc_auc_score(val_data["h_win"], mean_val_probs)
 
     bookies_val_mse = brier_score_loss(
@@ -144,8 +142,8 @@ def run_experiment(
             "train_mse": train_mse,
             "train_auc": train_auc,
             "val_mse": val_mse,
-            "val_mse_5_percentile": val_mse_ci[0],
-            "val_mse_95_percentile": val_mse_ci[1],
+            # "val_mse_5_percentile": val_mse_ci[0],
+            # "val_mse_95_percentile": val_mse_ci[1],
             "val_auc": val_auc,
             "bookies_val_mse": bookies_val_mse,
             "bookies_val_auc": bookies_val_auc,
