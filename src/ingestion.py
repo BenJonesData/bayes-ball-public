@@ -37,12 +37,15 @@ def _enrich_data_fduk(data: pd.DataFrame) -> pd.DataFrame:
 def get_data_fduk(
     seasons: Iterable[int],
     leagues: List[str],
-    columns: List[str],
-    enrich: bool,
+    columns: List[str] | None = None,
+    enrich: bool = False,
 ) -> None:
 
     with open("config/config.json", "r") as f:
         column_mapping = json.load(f)
+    
+    if columns is None:
+        columns = list(column_mapping.values())
 
     data_list = []
     for start_y in seasons:
@@ -57,15 +60,13 @@ def get_data_fduk(
                 + f"{season}/{league}.csv"
             )
             try:
-                data = pd.read_csv(url)
+                data = pd.read_csv(url).rename(columns=column_mapping)
                 data["season"] = season_tag
 
                 include_columns = [
                     col for col in columns if col in data.columns
                 ]
                 data = data[include_columns]
-
-                data = data.rename(columns=column_mapping)
 
                 if enrich:
                     data = _enrich_data_fduk(data)

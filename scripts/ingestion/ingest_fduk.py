@@ -2,35 +2,6 @@ import argparse
 
 from src.ingestion import get_data_fduk
 
-
-DEFAULT_COLS = [
-    "season",
-    "Div",
-    "Date",
-    "HomeTeam",
-    "AwayTeam",
-    "B365H",
-    "B365D",
-    "B365A",
-    "FTHG",
-    "FTAG",
-    "FTR",
-    "HTHG",
-    "HTAG",
-    "HTR",
-    "HS",
-    "AS",
-    "HST",
-    "AST",
-    "HC",
-    "AC",
-    "HF",
-    "AF",
-    "HY",
-    "AY",
-    "HR",
-    "AR",
-]
 LEAGUES = ["E0"]
 
 if __name__ == "__main__":
@@ -63,7 +34,7 @@ if __name__ == "__main__":
         "--columns",
         nargs="+",
         type=str,
-        default=DEFAULT_COLS,
+        default=None,
         help="List of columns to include",
     )
 
