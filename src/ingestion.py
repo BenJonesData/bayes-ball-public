@@ -42,9 +42,9 @@ def get_data_fduk(
     data_list = []
     for start_y in seasons:
         start_y_str = ("0" + str(start_y))[-2:]
-        start_y_str = ("0" + str(start_y + 1))[-2:]
-        season = str(start_y) + str(start_y + 1)
-        season_tag = str(start_y) + "_" + str(start_y + 1)
+        end_y_str = ("0" + str(start_y + 1))[-2:]
+        season = start_y_str + end_y_str
+        season_tag = start_y_str + "_" + end_y_str 
         
         for league in leagues:
             url = (
