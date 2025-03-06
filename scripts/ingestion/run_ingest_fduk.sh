@@ -8,6 +8,6 @@ poetry run python scripts/ingestion/ingest_fduk.py \
     --start_year 0 \
     --end_year 25 \
     --leagues 'E0' 'I1' \
-    --columns 'HomeTeam' 'AwayTeam' 'FTR' 'B365H' \
+    --columns 'home_team' 'away_team' 'result' 'odds_h_b365' \
     --save_filename 'ingested_fduk_data' \
-    --enrich True
+    --enrich False

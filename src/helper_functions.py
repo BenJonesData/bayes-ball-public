@@ -3,6 +3,9 @@ from sklearn.model_selection import train_test_split
 from typing import Tuple
 import tf_keras as tfk
 from tqdm import tqdm
+import random
+import string
+from pathlib import Path
 
 
 class EpochProgressBar(tfk.callbacks.Callback):
@@ -32,3 +35,18 @@ def get_train_test(
     test_data = data.loc[data["season"].isin(test_groups)]
 
     return train_data, test_data
+
+
+def generate_random_string(length=6):
+    characters = string.ascii_letters + string.digits
+    random_string = "".join(random.choices(characters, k=length))
+    return random_string
+
+
+def find_repo_root():
+    path = Path.cwd()
+    while path != path.parent:
+        if (path / ".git").exists():
+            return path
+        path = path.parent
+    raise FileNotFoundError("Could not find repository root")

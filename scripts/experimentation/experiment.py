@@ -40,6 +40,7 @@ if __name__ == "__main__":
         default="data/val_data.csv",
         help="Path of validation data csv",
     )
+
     parser.add_argument(
         "--hidden_units",
         nargs="+",
