@@ -42,12 +42,12 @@ def get_data_fduk(
     columns: List[str] | None = None,
     enrich: bool = False,
 ) -> None:
-    
+
     repo_root = find_repo_root()
     config_path = repo_root / "config" / "config.json"
     with open(config_path, "r") as f:
         column_mapping = json.load(f)
-    
+
     if columns is None:
         columns = ["season"] + list(column_mapping.values())
 
@@ -65,7 +65,7 @@ def get_data_fduk(
             )
             try:
                 data = pd.read_csv(url)
-                data=data.rename(columns=column_mapping)
+                data = data.rename(columns=column_mapping)
                 data["season"] = season_tag
 
                 include_columns = [
@@ -90,7 +90,12 @@ def get_data_fduk(
 
     data_full = pd.concat(data_list).reset_index()
 
-    reorder_columns = [col for col in columns if col in data_full.columns] + ["game_num_h", "game_num_a", "season_half_h", "season_half_a"]
+    reorder_columns = [col for col in columns if col in data_full.columns] + [
+        "game_num_h",
+        "game_num_a",
+        "season_half_h",
+        "season_half_a",
+    ]
     data_full = data_full[reorder_columns]
 
     return data_full

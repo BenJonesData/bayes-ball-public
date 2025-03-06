@@ -7,6 +7,7 @@ import random
 import string
 from pathlib import Path
 
+
 class EpochProgressBar(tfk.callbacks.Callback):
     def on_train_begin(self, logs=None):
         self.epochs = self.params.get("epochs", 1)
@@ -35,15 +36,16 @@ def get_train_test(
 
     return train_data, test_data
 
+
 def generate_random_string(length=6):
     characters = string.ascii_letters + string.digits
-    random_string = ''.join(random.choices(characters, k=length))
+    random_string = "".join(random.choices(characters, k=length))
     return random_string
 
 
 def find_repo_root():
     path = Path.cwd()
-    while path != path.parent: 
+    while path != path.parent:
         if (path / ".git").exists():
             return path
         path = path.parent
