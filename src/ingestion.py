@@ -4,6 +4,8 @@ from loguru import logger
 from collections import Counter
 import json
 
+from src.helper_functions import find_repo_root
+
 
 def _enrich_data_fduk(data: pd.DataFrame) -> pd.DataFrame:
     output_data = data.copy()
@@ -40,12 +42,14 @@ def get_data_fduk(
     columns: List[str] | None = None,
     enrich: bool = False,
 ) -> None:
-
-    with open("config/config.json", "r") as f:
+    
+    repo_root = find_repo_root()
+    config_path = repo_root / "config" / "config.json"
+    with open(config_path, "r") as f:
         column_mapping = json.load(f)
     
     if columns is None:
-        columns = list(column_mapping.values())
+        columns = ["season"] + list(column_mapping.values())
 
     data_list = []
     for start_y in seasons:
@@ -60,12 +64,14 @@ def get_data_fduk(
                 + f"{season}/{league}.csv"
             )
             try:
-                data = pd.read_csv(url).rename(columns=column_mapping)
+                data = pd.read_csv(url)
+                data=data.rename(columns=column_mapping)
                 data["season"] = season_tag
 
                 include_columns = [
                     col for col in columns if col in data.columns
                 ]
+
                 data = data[include_columns]
 
                 if enrich:
@@ -82,6 +88,9 @@ def get_data_fduk(
                 )
                 continue
 
-    data_full = pd.concat(data_list)
+    data_full = pd.concat(data_list).reset_index()
+
+    reorder_columns = [col for col in columns if col in data_full.columns] + ["game_num_h", "game_num_a", "season_half_h", "season_half_a"]
+    data_full = data_full[reorder_columns]
 
     return data_full
