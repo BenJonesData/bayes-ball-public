@@ -1,4 +1,7 @@
 data/*.csv
+data/*.json
 mlflow
-mlruns
 __pycache__
+mlruns
+credentials.py
+.venv

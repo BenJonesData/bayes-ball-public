@@ -1,0 +1,1 @@
+SM_API_KEY = "enter_api_key_here_and_remove_example_from_filename"
