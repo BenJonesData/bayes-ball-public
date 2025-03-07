@@ -8,7 +8,7 @@ import pandas as pd
 import requests
 from loguru import logger
 
-from ingestion.sportmonks.config import BASE_URL, HEADERS, SAVE_LOCATION
+from src.ingestion.sportmonks.config import BASE_URL, HEADERS, SAVE_LOCATION
 
 
 def get_types():

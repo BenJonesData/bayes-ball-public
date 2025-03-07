@@ -9,8 +9,8 @@ import pandas as pd
 import requests
 from loguru import logger
 
-from ingestion.sportmonks.config import BASE_URL, HEADERS, SAVE_LOCATION
-from ingestion.sportmonks.league_codes_ingestion import get_leagues
+from src.ingestion.sportmonks.config import BASE_URL, HEADERS, SAVE_LOCATION
+from src.ingestion.sportmonks.league_codes_ingestion import get_leagues
 
 
 def get_fixtures_from_period(league_id, start_date, end_date):
