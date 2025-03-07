@@ -2,70 +2,25 @@ import pandas as pd
 from typing import Iterable, List
 from loguru import logger
 from collections import Counter
+import json
 
-DESIRED_COLS = [
-    "season",
-    "Div",
-    "Date",
-    "HomeTeam",
-    "AwayTeam",
-    "B365H",
-    "B365D",
-    "B365A",
-    "FTHG",
-    "FTAG",
-    "FTR",
-    "HTHG",
-    "HTAG",
-    "HTR",
-    "HS",
-    "AS",
-    "HST",
-    "AST",
-    "HC",
-    "AC",
-    "HF",
-    "AF",
-    "HY",
-    "AY",
-    "HR",
-    "AR",
-]
-LEAGUES = [
-    "E0",
-    "E1",
-    "E2",
-    "E3",
-    "EC",
-    "SC0",
-    "SC1",
-    "SC2",
-    "SC3",
-    "D1",
-    "D2",
-    "I1",
-    "I2",
-    "SP1",
-    "SP2",
-    "F1",
-    "F2",
-]
+from src.helper_functions import find_repo_root
 
 
-def enrich_data(data: pd.DataFrame) -> pd.DataFrame:
+def _enrich_data_fduk(data: pd.DataFrame) -> pd.DataFrame:
     output_data = data.copy()
 
-    teams = list(output_data["hometeam"].drop_duplicates())
+    teams = list(output_data["home_team"].drop_duplicates())
     half_way_point = len(teams) - 1
 
     team_counter = Counter()
     game_num_h = []
     game_num_a = []
     for _, row in output_data.iterrows():
-        team_counter[row["hometeam"]] += 1
-        game_num_h.append(team_counter[row["hometeam"]])
-        team_counter[row["awayteam"]] += 1
-        game_num_a.append(team_counter[row["awayteam"]])
+        team_counter[row["home_team"]] += 1
+        game_num_h.append(team_counter[row["home_team"]])
+        team_counter[row["away_team"]] += 1
+        game_num_a.append(team_counter[row["away_team"]])
     output_data["game_num_h"] = game_num_h
     output_data["game_num_a"] = game_num_a
 
@@ -81,20 +36,28 @@ def enrich_data(data: pd.DataFrame) -> pd.DataFrame:
     return output_data
 
 
-def get_data(seasons: Iterable[int], leagues: List[str] | str = "all") -> None:
-    if leagues == "all":
-        leagues = LEAGUES
-    elif not set(leagues).issubset(set(LEAGUES)):
-        raise ValueError(
-            f"""
-            Invalid league provided. Please chose one or more from {LEAGUES}
-        """
-        )
+def get_data_fduk(
+    seasons: Iterable[int],
+    leagues: List[str],
+    columns: List[str] | None = None,
+    enrich: bool = False,
+) -> None:
+
+    repo_root = find_repo_root()
+    config_path = repo_root / "config" / "config.json"
+    with open(config_path, "r") as f:
+        column_mapping = json.load(f)
+
+    if columns is None:
+        columns = ["season"] + list(column_mapping.values())
 
     data_list = []
     for start_y in seasons:
-        season = str(start_y) + str(start_y + 1)
-        season_tag = str(start_y) + "_" + str(start_y + 1)
+        start_y_str = ("0" + str(start_y))[-2:]
+        end_y_str = ("0" + str(start_y + 1))[-2:]
+        season = start_y_str + end_y_str
+        season_tag = start_y_str + "_" + end_y_str
+
         for league in leagues:
             url = (
                 "https://www.football-data.co.uk/mmz4281/"
@@ -102,11 +65,20 @@ def get_data(seasons: Iterable[int], leagues: List[str] | str = "all") -> None:
             )
             try:
                 data = pd.read_csv(url)
+                data = data.rename(columns=column_mapping)
                 data["season"] = season_tag
-                data = data[DESIRED_COLS]
-                data.columns = [col.lower() for col in data.columns]
-                processed_data = enrich_data(data)
-                data_list.append(processed_data)
+
+                include_columns = [
+                    col for col in columns if col in data.columns
+                ]
+
+                data = data[include_columns]
+
+                if enrich:
+                    data = _enrich_data_fduk(data)
+
+                data_list.append(data)
+
                 logger.info(
                     f"Sucessfully loaded data for {league} in {season_tag}"
                 )
@@ -116,10 +88,14 @@ def get_data(seasons: Iterable[int], leagues: List[str] | str = "all") -> None:
                 )
                 continue
 
-    data_full = pd.concat(data_list)
-    data_full.to_csv("data/raw_games.csv", index=False)
-    logger.info("All available data loaded and saved to data/raw_games.csv")
+    data_full = pd.concat(data_list).reset_index()
 
+    reorder_columns = [col for col in columns if col in data_full.columns] + [
+        "game_num_h",
+        "game_num_a",
+        "season_half_h",
+        "season_half_a",
+    ]
+    data_full = data_full[reorder_columns]
 
-if __name__ == "__main__":
-    get_data(range(10, 25))
+    return data_full

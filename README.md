@@ -2,8 +2,8 @@
 A Bayesian approach to predicting football match outcomes. This repository combines predictive modelling and Bayesian inference to uncover probabilistic insights into the data-generating processes behind the beautiful game.
 
 ## Data Sources
- - Match data was initially obtained from [football-data.co.uk](https://www.football-data.co.uk).
- - Data is also being sourced from [Sportmonks](https://my.sportmonks.com). 
+ - [football-data.co.uk](https://www.football-data.co.uk)
+ - [Sportmonks](https://my.sportmonks.com)
 
 ## Collaborators
 - Ben Jones
@@ -15,3 +15,4 @@ A Bayesian approach to predicting football match outcomes. This repository combi
   - [LinkedIn](https://www.linkedin.com/in/charlie-young-a38219173/)
   - [GitHub](https://github.com/YoungOne360)
   - Email: Charlie.Young1@me.com
+

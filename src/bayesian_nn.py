@@ -75,7 +75,10 @@ def create_bnn_model(
 
 
 def model_inference(
-    model: tfk.Model, X: Dict[str, np.ndarray], num_samples: str, tag: str = None
+    model: tfk.Model,
+    X: Dict[str, np.ndarray],
+    num_samples: str,
+    tag: str = None,
 ) -> np.array:
     if tag is not None:
         tag = tag.title()
@@ -84,22 +87,10 @@ def model_inference(
     sampled_probs = np.stack(
         [
             model(X, training=True).numpy().flatten()
-            for _ in tqdm(range(num_samples), desc=f"{tag}Output Sampling Progress")
+            for _ in tqdm(
+                range(num_samples), desc=f"{tag}Output Sampling Progress"
+            )
         ]
     )
 
     return sampled_probs
-
-
-class EpochProgressBar(tfk.callbacks.Callback):
-    def on_train_begin(self, logs=None):
-        self.epochs = self.params.get("epochs", 1)
-        self.progress_bar = tqdm(
-            total=self.epochs, desc="Training Progress", unit="epoch"
-        )
-
-    def on_epoch_end(self, epoch, logs=None):
-        self.progress_bar.update(1)
-
-    def on_train_end(self, logs=None):
-        self.progress_bar.close()

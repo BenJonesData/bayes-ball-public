@@ -1,23 +1,7 @@
 import pandas as pd
-from typing import List, Tuple
+from typing import List
 from loguru import logger
-from sklearn.model_selection import train_test_split
-import os
-
-
-def get_train_test(
-    data: pd.DataFrame, test_size: int = 2, random_state: int = None
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    unique_groups = data.loc[:, "season"].unique()
-
-    train_groups, test_groups = train_test_split(
-        unique_groups, test_size=test_size, random_state=random_state
-    )
-
-    train_data = data.loc[data["season"].isin(train_groups)]
-    test_data = data.loc[data["season"].isin(test_groups)]
-
-    return train_data, test_data
+from src.helper_functions import get_train_test
 
 
 def create_dataframe(
@@ -175,37 +159,14 @@ def create_dataframe(
     results_h2.dropna(subset="b365h", inplace=True)
     results_h2 = results_h2[results_h2["b365h"] != 0]
 
-    bookies_margin = (1 / results_h2["b365h"]) + (1 / results_h2["b365d"]) + (1 / results_h2["b365a"])
+    bookies_margin = (
+        (1 / results_h2["b365h"])
+        + (1 / results_h2["b365d"])
+        + (1 / results_h2["b365a"])
+    )
     results_h2["bookies_prob"] = bookies_margin / results_h2["b365h"]
 
     logger.info("Dataset creation complete")
     logger.info(f"Dataset length: {len(results_h2)}")
 
     return results_h2
-
-
-if __name__ == "__main__":
-    raw_games = pd.read_csv("data/raw_games.csv")
-    df = create_dataframe(
-        raw_games, exclude_seasons=["19_20", "20_21", "24_25"]
-    )
-
-    train_val, test = get_train_test(df, test_size=3, random_state=147)
-
-    train_val = train_val.drop(
-        columns=[
-            "div",
-            "date",
-            "h_team",
-            "a_team",
-            "ftr",
-            "b365h",
-            "b365d",
-            "b365a",
-        ]
-    )
-
-    train_val.to_csv("data/train_val_data.csv", index=False)
-    test.to_csv("data/test_data.csv", index=False)
-
-    os.remove("data/raw_games.csv")
