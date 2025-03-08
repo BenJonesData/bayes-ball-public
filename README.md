@@ -15,9 +15,3 @@ A Bayesian approach to predicting football match outcomes. This repository combi
   - [LinkedIn](https://www.linkedin.com/in/charlie-young-a38219173/)
   - [GitHub](https://github.com/YoungOne360)
   - Email: Charlie.Young1@me.com
-
-.
-.
-.
-.
-...
