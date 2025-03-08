@@ -13,6 +13,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: public
+          fetch-depth: 0
           persist-credentials: false
 
       - name: Set up Git config
@@ -24,7 +25,7 @@ jobs:
         run: git remote remove origin
 
       - name: Remove credential helper
-        run: git config --global --unset-all credential.helper || true      
+        run: git config --global --unset-all credential.helper || true
 
       - name: Add Public Repo as Remote
         run: |
