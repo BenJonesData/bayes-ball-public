@@ -19,10 +19,10 @@ jobs:
           git config --global user.name "BenJonesData"
           git config --global user.email "benjones1479@gmail.com"
 
-      - name: Add Public Repo as Remote
-        run: |
-          git remote add publicRepo https://BenJonesData:${{ secrets.PAT_TOKEN }}@github.com/benjonesdata/bayes-ball-public.git
+    #   - name: Add Public Repo as Remote
+    #     run: |
+    #       git remote add publicRepo https://BenJonesData:${{ secrets.PAT_TOKEN }}@github.com/benjonesdata/bayes-ball-public.git
 
       - name: Push changes to Public Repo
         run: |
-          git push publicRepo public:main --force
+          git push https://benjonesdata:${{ secrets.PAT_TOKEN }}@github.com/benjonesdata/bayes-ball-public.git public:main --force
