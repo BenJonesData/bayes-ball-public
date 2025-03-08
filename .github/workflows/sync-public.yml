@@ -1,0 +1,28 @@
+name: Sync Public Branch to Public Repo
+
+on:
+  push:
+    branches:
+      - public 
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Public Branch
+        uses: actions/checkout@v3
+        with:
+          ref: public
+
+      - name: Set up Git config
+        run: |
+          git config --global user.name "BenJonesData"
+          git config --global user.email "benjones1479@gmail.com"
+
+      - name: Add Public Repo as Remote
+        run: |
+          git remote add publicRepo https://$GITHUB_ACTOR:${{ secrets.PAT_TOKEN }}@github.com/benjonesdata/bayes-ball-public.git
+
+      - name: Push changes to Public Repo
+        run: |
+          git push publicRepo public:main --force
