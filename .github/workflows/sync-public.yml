@@ -21,7 +21,7 @@ jobs:
 
       - name: Add Public Repo as Remote
         run: |
-          git remote add publicRepo https://$GITHUB_ACTOR:${{ secrets.PAT_TOKEN }}@github.com/benjonesdata/bayes-ball-public.git
+          git remote add publicRepo https://BenJonesData:${{ secrets.PAT_TOKEN }}@github.com/benjonesdata/bayes-ball-public.git
 
       - name: Push changes to Public Repo
         run: |
