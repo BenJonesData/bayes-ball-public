@@ -16,13 +16,19 @@ jobs:
 
       - name: Set up Git config
         run: |
-          git config --global user.name "BenJonesData"
-          git config --global user.email "benjones1479@gmail.com"
+          git config --global user.name "Your Bot Name"
+          git config --global user.email "yourusername@users.noreply.github.com"
 
-    #   - name: Add Public Repo as Remote
-    #     run: |
-    #       git remote add publicRepo https://BenJonesData:${{ secrets.PAT_TOKEN }}@github.com/benjonesdata/bayes-ball-public.git
+      - name: Remove default origin remote
+        run: git remote remove origin
+
+      - name: Add Public Repo as Remote
+        run: |
+          git remote add publicRepo "https://benjonesdata:${{ secrets.PAT_TOKEN }}@github.com/benjonesdata/bayes-ball-public.git"
+
+      - name: List remotes for debugging
+        run: git remote -v
 
       - name: Push changes to Public Repo
         run: |
-          git push https://benjonesdata:${{ secrets.PAT_TOKEN }}@github.com/benjonesdata/bayes-ball-public.git public:main --force
+          git push publicRepo public:main --force
