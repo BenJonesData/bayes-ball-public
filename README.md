@@ -17,5 +17,3 @@ A Bayesian approach to predicting football match outcomes. This repository combi
   - Email: Charlie.Young1@me.com
 
 .
-.
-.
